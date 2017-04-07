@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="littlebyte" />
+
+
+
+<meta name="description" content="最近在项目中用到OpenResty做服务端的接口，其中接口认证方面又用到了RSA算法进行加解密。但是目前OpenResty并没有官方的rsa模块，只有doujiang24前辈提供的lua-resty-rsa库，但是该库只支持公钥加密私钥解密，对私钥加密公钥解密却不支持，为了完善这一方面的缺陷，开发了自己的rsa加解密库">
+<meta property="og:type" content="article">
+<meta property="og:title" content="openresty-rsa加解密库">
+<meta property="og:url" content="http://little-byte.com/2016/08/20/openresty-rsa加解密库/index.html">
+<meta property="og:site_name" content="little-byte写字台">
+<meta property="og:description" content="最近在项目中用到OpenResty做服务端的接口，其中接口认证方面又用到了RSA算法进行加解密。但是目前OpenResty并没有官方的rsa模块，只有doujiang24前辈提供的lua-resty-rsa库，但是该库只支持公钥加密私钥解密，对私钥加密公钥解密却不支持，为了完善这一方面的缺陷，开发了自己的rsa加解密库">
+<meta property="og:updated_time" content="2017-03-03T10:39:27.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="openresty-rsa加解密库">
+<meta name="twitter:description" content="最近在项目中用到OpenResty做服务端的接口，其中接口认证方面又用到了RSA算法进行加解密。但是目前OpenResty并没有官方的rsa模块，只有doujiang24前辈提供的lua-resty-rsa库，但是该库只支持公钥加密私钥解密，对私钥加密公钥解密却不支持，为了完善这一方面的缺陷，开发了自己的rsa加解密库">
+
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="little-byte写字台" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/favicon.png">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>openresty-rsa加解密库 | little-byte写字台</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: true
+    }
+</script>
+
+
+    <script>
+        yiliaConfig.jquery_ui = [true, "//cdn.bootcss.com/jqueryui/1.10.4/jquery-ui.min.js", "//cdn.bootcss.com/jqueryui/1.10.4/css/jquery-ui.min.css"];
+    </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.png" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">littlebyte</a></h1>
+        </hgroup>
+
+        
+
+        
+            <form id="search-form">
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="false" />
+            <i class="fa fa-times" onclick="resetSearch()"></i>
+            </form>
+            <div id="local-search-result"></div>
+            <p class='no-result'>No results found <i class='fa fa-spinner fa-pulse'></i></p>
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>Menu</li>
+                        <li>Tags</li>
+                        
+                        <li>Friends</li>
+                        
+                        
+                        <li>About Me</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="mailto:lizhj@corp.21cn.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" href="https://github.com/LittleLiByte" title="GitHub"></a>
+                            
+                                <a class="fa 网易云音乐" href="http://music.163.com/#/user/home?id=40353865" title="网易云音乐"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/">Hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Lua/">Lua</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nginx/">Nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RSA/">RSA</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tinker/">Tinker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/YeLee/">YeLee</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/热修复/">热修复</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://pages.github.com/">GitHub</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="http://moxfive.xyz/">MOxFIVE</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">专注于前端</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">littlebyte</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">littlebyte</a></h1>
+            </hgroup>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="mailto:lizhj@corp.21cn.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="https://github.com/LittleLiByte" title="GitHub"></a>
+                            
+                                <a class="fa 网易云音乐" target="_blank" href="http://music.163.com/#/user/home?id=40353865" title="网易云音乐"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="Tags" friends="Friends" about="About Me"/>
+</nav>
+      <div class="body-wrap"><article id="post-openresty-rsa加解密库" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/08/20/openresty-rsa加解密库/" class="article-date">
+      <time datetime="2016-08-20T08:53:22.000Z" itemprop="datePublished">2016-08-20</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      openresty-rsa加解密库
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/OpenResty/">OpenResty</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Lua/">Lua</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Nginx/">Nginx</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RSA/">RSA</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <p>因为lua相关的RSA加解密库比较少，而C和C++相关的RSA加解密库却比较多，因此萌生了通过LuaJit的FFI  拓展库来调用C或C++实现来封装成Lua 的RSA库。经过谷歌终于找到了一个很符合要求的实现方法：<br><a href="http://hayageek.com/rsa-encryption-decryption-openssl-c/" target="_blank" rel="external">http://hayageek.com/rsa-encryption-decryption-openssl-c/</a></p>
+<p>下面就来说说整个开发详细流程</p>
+<h2 id="安装OpenSSL"><a href="#安装OpenSSL" class="headerlink" title="安装OpenSSL"></a>安装OpenSSL</h2><p>RSA加密和解密的公钥私钥由OpenSSL生成。在Ubuntu下，安装OpenSSL通过以下两条命令可以完成：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">sudo apt-get install openssl</div><div class="line">sudo apt-get install libssl-dev</div></pre></td></tr></table></figure></p>
+<h2 id="生成公钥和私钥"><a href="#生成公钥和私钥" class="headerlink" title="生成公钥和私钥"></a>生成公钥和私钥</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">-- 生成 RSA 私钥（传统格式的,PKCS<span class="comment">#1标准）</span></div><div class="line">openssl genrsa -out rsa_private_key.pem 1024</div><div class="line">-- 将传统格式的私钥转换成 PKCS<span class="comment">#8 格式的（JAVA需要使用的私钥需要经过PKCS#8编码,而本次在项目作为接口使用Lua编写，如不需要这一步其实可以略过）</span></div><div class="line">openssl pkcs8 -topk8 -inform PEM -in rsa_private_key.pem -outform PEM -nocrypt</div><div class="line">-- 生成 RSA 公钥</div><div class="line">openssl rsa -in rsa_private_key.pem -pubout -out rsa_public_key.pem</div></pre></td></tr></table></figure>
+<h2 id="编译动态链接库"><a href="#编译动态链接库" class="headerlink" title="编译动态链接库"></a>编译动态链接库</h2><p>参考上面给的链接，要封装的RSA加解密C语言实现版如下：<br>rsa.c文件<br><figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;openssl/pem.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;openssl/ssl.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;openssl/rsa.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;openssl/evp.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;openssl/bio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;openssl/err.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"> </div><div class="line"><span class="keyword">int</span> padding = RSA_PKCS1_PADDING;</div><div class="line"> </div><div class="line"><span class="function">RSA * <span class="title">createRSA</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">char</span> * key,<span class="keyword">int</span> <span class="keyword">public</span>)</span></span></div><div class="line">&#123;</div><div class="line">    RSA *rsa= <span class="literal">NULL</span>;</div><div class="line">    BIO *keybio ;</div><div class="line">    keybio = BIO_new_mem_buf(key, <span class="number">-1</span>);</div><div class="line">    <span class="keyword">if</span> (keybio==<span class="literal">NULL</span>)</div><div class="line">    &#123;</div><div class="line">        <span class="built_in">printf</span>( <span class="string">"Failed to create key BIO"</span>);</div><div class="line">        <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span>(<span class="keyword">public</span>)</div><div class="line">    &#123;</div><div class="line">        rsa = PEM_read_bio_RSA_PUBKEY(keybio, &amp;rsa,<span class="literal">NULL</span>, <span class="literal">NULL</span>);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">else</span></div><div class="line">    &#123;</div><div class="line">        rsa = PEM_read_bio_RSAPrivateKey(keybio, &amp;rsa,<span class="literal">NULL</span>, <span class="literal">NULL</span>);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span>(rsa == <span class="literal">NULL</span>)</div><div class="line">    &#123;</div><div class="line">        <span class="built_in">printf</span>( <span class="string">"Failed to create RSA"</span>);</div><div class="line">    &#125;</div><div class="line"> </div><div class="line">    <span class="keyword">return</span> rsa;</div><div class="line">&#125;</div><div class="line"> </div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">public_encrypt</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">char</span> * data,<span class="keyword">int</span> data_len,<span class="keyword">unsigned</span> <span class="keyword">char</span> * key, <span class="keyword">unsigned</span> <span class="keyword">char</span> *encrypted)</span></span></div><div class="line">&#123;</div><div class="line">    RSA * rsa = createRSA(key,<span class="number">1</span>);</div><div class="line">    <span class="keyword">int</span> result = RSA_public_encrypt(data_len,data,encrypted,rsa,padding);</div><div class="line">    <span class="keyword">return</span> result;</div><div class="line">&#125;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">private_decrypt</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">char</span> * enc_data,<span class="keyword">int</span> data_len,<span class="keyword">unsigned</span> <span class="keyword">char</span> * key, <span class="keyword">unsigned</span> <span class="keyword">char</span> *decrypted)</span></span></div><div class="line">&#123;</div><div class="line">    RSA * rsa = createRSA(key,<span class="number">0</span>);</div><div class="line">    <span class="keyword">int</span>  result = RSA_private_decrypt(data_len,enc_data,decrypted,rsa,padding);</div><div class="line">    <span class="keyword">return</span> result;</div><div class="line">&#125;</div><div class="line"> </div><div class="line"> </div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">private_encrypt</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">char</span> * data,<span class="keyword">int</span> data_len,<span class="keyword">unsigned</span> <span class="keyword">char</span> * key, <span class="keyword">unsigned</span> <span class="keyword">char</span> *encrypted)</span></span></div><div class="line">&#123;</div><div class="line">    RSA * rsa = createRSA(key,<span class="number">0</span>);</div><div class="line">    <span class="keyword">int</span> result = RSA_private_encrypt(data_len,data,encrypted,rsa,padding);</div><div class="line">    <span class="keyword">return</span> result;</div><div class="line">&#125;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">public_decrypt</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">char</span> * enc_data,<span class="keyword">int</span> data_len,<span class="keyword">unsigned</span> <span class="keyword">char</span> * key, <span class="keyword">unsigned</span> <span class="keyword">char</span> *decrypted)</span></span></div><div class="line">&#123;</div><div class="line">    RSA * rsa = createRSA(key,<span class="number">1</span>);</div><div class="line">    <span class="keyword">int</span>  result = RSA_public_decrypt(data_len,enc_data,decrypted,rsa,padding);</div><div class="line">    <span class="keyword">return</span> result;</div><div class="line">&#125;</div><div class="line"> </div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">printLastError</span><span class="params">(<span class="keyword">char</span> *msg)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">char</span> * err = <span class="built_in">malloc</span>(<span class="number">130</span>);;</div><div class="line">    ERR_load_crypto_strings();</div><div class="line">    ERR_error_string(ERR_get_error(), err);</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"%s ERROR: %s\n"</span>,msg, err);</div><div class="line">    <span class="built_in">free</span>(err);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>在ubuntu下通过以下命令来生成.so库<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># gcc rsa.c -fPIC -shared -o librsa.so</span></div></pre></td></tr></table></figure></p>
+<h2 id="使用rsa-so库"><a href="#使用rsa-so库" class="headerlink" title="使用rsa.so库"></a>使用rsa.so库</h2><p>生成的动态链接库放到<strong>usr/lib</strong>目录下就能使用了，以下使用rsa.so封装了一个lua版的rsa加解密库<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">module</span>(<span class="string">"rsa"</span>, <span class="built_in">package</span>.seeall)</div><div class="line"><span class="keyword">local</span> ffi = <span class="built_in">require</span>(<span class="string">'ffi'</span>)</div><div class="line"> </div><div class="line"><span class="keyword">local</span> rsa = ffi.<span class="built_in">load</span>(<span class="string">'rsa'</span>)</div><div class="line"> </div><div class="line">ffi.cdef <span class="string">[[</span></div><div class="line">int public_encrypt(unsigned char * data,int data_len,unsigned char * key, unsigned char *encrypted);</div><div class="line">int private_decrypt(unsigned char * enc_data,int data_len,unsigned char * key, unsigned char *decrypted);</div><div class="line"> </div><div class="line">int private_encrypt(unsigned char * data,int data_len,unsigned char * key, unsigned char *encrypted);</div><div class="line">int public_decrypt(unsigned char * enc_data,int data_len,unsigned char * key, unsigned char *decrypted);</div><div class="line">]]</div><div class="line"> </div><div class="line"><span class="keyword">local</span> _M = &#123; <span class="built_in">_VERSION</span> = <span class="string">'1.0'</span> &#125;</div><div class="line"> </div><div class="line"><span class="comment">--公钥加密</span></div><div class="line"><span class="function"><span class="keyword">function</span> _M.public_encrypt<span class="params">(msg, publicKey)</span></span></div><div class="line">    <span class="keyword">local</span> c_str = ffi.new(<span class="string">"char[?]"</span>, <span class="number">1024</span> / <span class="number">8</span>)</div><div class="line">    ffi.copy(c_str, msg)</div><div class="line">    <span class="keyword">local</span> pub = ffi.new(<span class="string">"char[?]"</span>, #publicKey)</div><div class="line">    ffi.copy(pub, publicKey)</div><div class="line">    <span class="comment">--存放加密结果</span></div><div class="line">    <span class="keyword">local</span> encrypt = ffi.new(<span class="string">"char[?]"</span>, <span class="number">2048</span>)</div><div class="line">    <span class="keyword">local</span> ret = rsa.public_encrypt(c_str, #msg, pub, encrypt)</div><div class="line">    <span class="keyword">if</span> ret == <span class="number">-1</span> <span class="keyword">then</span></div><div class="line">        <span class="keyword">return</span> <span class="keyword">nil</span></div><div class="line">    <span class="keyword">end</span></div><div class="line">    <span class="keyword">return</span> ffi.<span class="built_in">string</span>(encrypt,ret)</div><div class="line"><span class="keyword">end</span></div><div class="line"> </div><div class="line"><span class="comment">--私钥解密</span></div><div class="line"><span class="function"><span class="keyword">function</span> _M.private_decrypt<span class="params">(msg, privateKey)</span></span></div><div class="line">    <span class="keyword">local</span> c_str = ffi.new(<span class="string">"char[?]"</span>, <span class="number">1024</span> / <span class="number">8</span>)</div><div class="line">    ffi.copy(c_str, msg)</div><div class="line">    <span class="keyword">local</span> pri = ffi.new(<span class="string">"char[?]"</span>, #privateKey)</div><div class="line">    ffi.copy(pri, privateKey)</div><div class="line">    <span class="comment">--存放解密结果</span></div><div class="line">    <span class="keyword">local</span> decrypt = ffi.new(<span class="string">"char[?]"</span>, <span class="number">2048</span>)</div><div class="line">    <span class="keyword">local</span> ret = rsa.private_decrypt(c_str, #msg, pri, decrypt)</div><div class="line">    <span class="keyword">if</span> ret == <span class="number">-1</span> <span class="keyword">then</span></div><div class="line">        <span class="keyword">return</span> <span class="keyword">nil</span></div><div class="line">    <span class="keyword">end</span></div><div class="line">    <span class="keyword">return</span> ffi.<span class="built_in">string</span>(decrypt,ret)</div><div class="line"><span class="keyword">end</span></div><div class="line"> </div><div class="line"><span class="comment">--私钥加密</span></div><div class="line"><span class="function"><span class="keyword">function</span> _M.private_encrypt<span class="params">(msg, privateKey)</span></span></div><div class="line">    <span class="keyword">local</span> c_str = ffi.new(<span class="string">"char[?]"</span>, <span class="number">1024</span> / <span class="number">8</span>)</div><div class="line">    ffi.copy(c_str, msg)</div><div class="line">    <span class="keyword">local</span> pri = ffi.new(<span class="string">"char[?]"</span>, #privateKey)</div><div class="line">    ffi.copy(pri, privateKey)</div><div class="line">    <span class="comment">--存放加密结果</span></div><div class="line">    <span class="keyword">local</span> encrypt = ffi.new(<span class="string">"char[?]"</span>, <span class="number">2048</span>)</div><div class="line">    <span class="keyword">local</span> ret = rsa.private_encrypt(c_str, #msg, pri, encrypt)</div><div class="line">    <span class="keyword">if</span> ret == <span class="number">-1</span> <span class="keyword">then</span></div><div class="line">        <span class="keyword">return</span> <span class="keyword">nil</span></div><div class="line">    <span class="keyword">end</span></div><div class="line">    <span class="keyword">return</span> ffi.<span class="built_in">string</span>(encrypt,ret)</div><div class="line"><span class="keyword">end</span></div><div class="line"> </div><div class="line"><span class="comment">--公钥解密</span></div><div class="line"><span class="function"><span class="keyword">function</span> _M.public_decrypt<span class="params">(msg, publicKey)</span></span></div><div class="line">    <span class="keyword">local</span> c_str = ffi.new(<span class="string">"char[?]"</span>, <span class="number">1024</span> / <span class="number">8</span>)</div><div class="line">    ffi.copy(c_str, msg)</div><div class="line">    <span class="keyword">local</span> pub = ffi.new(<span class="string">"char[?]"</span>, #publicKey)</div><div class="line">    ffi.copy(pub, publicKey)</div><div class="line">    <span class="comment">--存放解密结果</span></div><div class="line">    <span class="keyword">local</span> decrypt = ffi.new(<span class="string">"char[?]"</span>, <span class="number">2048</span>)</div><div class="line">    <span class="keyword">local</span> ret = rsa.public_decrypt(c_str, #msg, pub, decrypt)</div><div class="line">    <span class="keyword">if</span> ret == <span class="number">-1</span> <span class="keyword">then</span></div><div class="line">        <span class="keyword">return</span> <span class="keyword">nil</span></div><div class="line">    <span class="keyword">end</span></div><div class="line">    <span class="keyword">return</span> ffi.<span class="built_in">string</span>(decrypt,ret)</div><div class="line"><span class="keyword">end</span></div><div class="line"> </div><div class="line"><span class="keyword">return</span> _M</div></pre></td></tr></table></figure></p>
+<p>就这样，本人的openresty rsa加解密第三方库就制作完成了，支持公钥加密私钥解密，也支持私钥加密公钥解密。下面贴出本人的测试代码：<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">local</span> rsa = <span class="built_in">require</span> <span class="string">"resty.rsa"</span></div><div class="line"><span class="keyword">local</span> RSA_PUBLIC_KEY = <span class="string">[[-----BEGIN PUBLIC KEY-----</span></div><div class="line">MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC3bTBJNQJjY6u7Y5b2eOWws0yW</div><div class="line">CGuWPm6MGOSVan65wCrJa5p3q3sodQUDVPotjsknjLlje9E1F7Bx94ZuqTwkvAr6</div><div class="line">ieLkgbbeqTCzeJ0AryUXiF3auxFSPdpBoD6nxtEeN8bZwfa/IYzdKyKlbhiQbUMN</div><div class="line">qWgmxiPVwupwAML7RQIDAQAB</div><div class="line">-----END PUBLIC KEY-----]]</div><div class="line"><span class="keyword">local</span> RSA_PRIV_KEY = <span class="string">[[-----BEGIN RSA PRIVATE KEY-----</span></div><div class="line">MIICXAIBAAKBgQC3bTBJNQJjY6u7Y5b2eOWws0yWCGuWPm6MGOSVan65wCrJa5p3</div><div class="line">q3sodQUDVPotjsknjLlje9E1F7Bx94ZuqTwkvAr6ieLkgbbeqTCzeJ0AryUXiF3a</div><div class="line">uxFSPdpBoD6nxtEeN8bZwfa/IYzdKyKlbhiQbUMNqWgmxiPVwupwAML7RQIDAQAB</div><div class="line">AoGAc4NXvUKc1mqWY9Q75cwNGlJQEMwMtPlsNN4YVeBTHjdeuqoBBQwA62GGXqrN</div><div class="line">QpOBKl79ASGghob8n0j6aAY70PQqHSU4c06c7UlkeEvxJKlyUTO2UgnjjIHb2flR</div><div class="line">uW8y3xmjpXAfwe50eAVMNhCon7DBc+XMF/paSVwiG8V+GAECQQDvosVLImUkIXGf</div><div class="line">I2AJ2iSOUF8W1UZ5Ru68E8hJoVkNehk14RUFzTkwhoPHYDseZyEhSunFQbXCotlL</div><div class="line">Ar5+O+lBAkEAw/PJXvi3S557ihDjYjKnj/2XtIa1GwBJxOliVM4eVjfRX15OXPR2</div><div class="line">6shID4ZNWfkWN3fjVm4CnUS41+bzHNctBQJAGCeiF3a6FzA/0bixH40bjjTPwO9y</div><div class="line">kRrzSYX89F8NKOybyfCMO+95ykhk1B4BF4lxr3drpPSAq8Paf1MhfHvxgQJBAJUB</div><div class="line">0WNy5o+OWItJBGAr/Ne2E6KnvRhnQ7GFd8zdYJxXndNTt2tgSv2Gh6WmjzOYApjz</div><div class="line">heC3jy1gkN89NCn+RrECQBTvoqFHfyAlwOGC9ulcAcQDqj/EgCRVkVe1IsQZenAe</div><div class="line">rKCWlUaeIKeVkRz/wzb1zy9AVsPC7Zbnf4nrOxJ23mI=</div><div class="line">-----END RSA PRIVATE KEY-----]]</div><div class="line"> </div><div class="line">ngx.say(<span class="string">'-----公钥加密私钥解密 start------'</span>)</div><div class="line"><span class="keyword">local</span> str=<span class="string">'i love lwl'</span></div><div class="line"> </div><div class="line"><span class="keyword">local</span> encryptPubStr = rsa.public_encrypt(str, RSA_PUBLIC_KEY)</div><div class="line"><span class="keyword">if</span> <span class="keyword">not</span> encryptPubStr <span class="keyword">then</span></div><div class="line">ngx.say(<span class="string">'pub encrypt failed'</span>)</div><div class="line"><span class="keyword">end</span></div><div class="line"><span class="keyword">local</span> decryptPriStr=rsa.private_decrypt(encryptPubStr,RSA_PRIV_KEY)</div><div class="line"><span class="keyword">if</span> <span class="keyword">not</span> decryptPriStr <span class="keyword">then</span></div><div class="line">ngx.say(<span class="string">'pri decrypt failed'</span>)</div><div class="line"><span class="keyword">end</span></div><div class="line">ngx.say(<span class="string">'公钥加密私钥解密成功\n'</span>..decryptPriStr)</div><div class="line">ngx.say(<span class="string">'-----公钥加密私钥解密 end------'</span>)</div><div class="line"> </div><div class="line">ngx.say(<span class="string">'================================'</span>)</div><div class="line"> </div><div class="line">ngx.say(<span class="string">'-----私钥加密公钥解密 start------'</span>)</div><div class="line"><span class="keyword">local</span> str=<span class="string">'i like lwl'</span></div><div class="line"> </div><div class="line"><span class="keyword">local</span> encryptPriStr = rsa.private_encrypt(str, RSA_PRIV_KEY)</div><div class="line"><span class="keyword">if</span> <span class="keyword">not</span> encryptPriStr <span class="keyword">then</span></div><div class="line">ngx.say(<span class="string">'pri encrypt failed'</span>)</div><div class="line"><span class="keyword">end</span></div><div class="line"><span class="keyword">local</span> decryptPubStr=rsa.public_decrypt(encryptPriStr,RSA_PUBLIC_KEY)</div><div class="line"><span class="keyword">if</span> <span class="keyword">not</span> decryptPubStr <span class="keyword">then</span></div><div class="line">ngx.say(<span class="string">'pub decrypt failed'</span>)</div><div class="line"><span class="keyword">end</span></div><div class="line">ngx.say(<span class="string">'公钥加密私钥解密成功\n'</span>..decryptPubStr)</div><div class="line">ngx.say(<span class="string">'-----私钥加密公钥解密 end------'</span>)</div></pre></td></tr></table></figure></p>
+<p>项目已托管到Github，欢迎star或fork，也欢迎提出改进意见。<br>传送门：<a href="https://github.com/LittleLiByte/lua-rsa" target="_blank" rel="external">lua-rsa</a></p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>Title:</span><a href="/2016/08/20/openresty-rsa加解密库/">openresty-rsa加解密库</a></p>
+        <p><span>Author:</span><a href="/" title="Back to Homepage">littlebyte</a></p>
+        <p><span>Created:</span>2016-08-20, 16:53:22</p>
+        <p><span>Updated:</span>2017-03-03, 18:39:27</p>
+        <p>
+            <span>Full URL:</span><a class="post-url" href="/2016/08/20/openresty-rsa加解密库/" title="openresty-rsa加解密库">http://little-byte.com/2016/08/20/openresty-rsa加解密库/</a>
+            <span class="copy-path" data-clipboard-text="From http://little-byte.com/2016/08/20/openresty-rsa加解密库/　　By littlebyte" title="Copy Article&#39;s Link &amp; Author"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>License:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"CC BY-NC-SA 4.0"</a> Keep Link &amp; Author if Distribute.
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/2017/02/28/Tinker调研/">
+                    Tinker调研
+                </a>
+            </div>
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/2016/08/10/Github-Hexo搭建博客全记录/">
+                    Github+Hexo搭建博客全记录
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#安装OpenSSL"><span class="toc-number">1.</span> <span class="toc-text">安装OpenSSL</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#生成公钥和私钥"><span class="toc-number">2.</span> <span class="toc-text">生成公钥和私钥</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#编译动态链接库"><span class="toc-number">3.</span> <span class="toc-text">编译动态链接库</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用rsa-so库"><span class="toc-number">4.</span> <span class="toc-text">使用rsa.so库</span></a></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="Hide"  title="Show or Hide Table of Contents">
+
+    <script>
+        yiliaConfig.toc = ["Hide", "Show", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"openresty-rsa加解密库　| little-byte写字台　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+      <div class="duoshuo" id="comments">
+    <div id="comment-box" ></div>
+    <div class="ds-thread" id="ds-thread" data-thread-key="2016/08/20/openresty-rsa加解密库/" data-title="openresty-rsa加解密库" data-url="http://little-byte.com/2016/08/20/openresty-rsa加解密库/"></div>
+    <script>
+        var duoshuoQuery = {short_name:"little-byte.duoshuo.com"};
+        var loadComment = function(){
+            var d = document, s = d.createElement('script');
+            s.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+            s.async = true; s.charset = 'UTF-8';
+            (d.head || d.body).appendChild(s);
+        }
+
+        
+    </script>
+    
+    <script> loadComment(); </script>
+
+</div>
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2017/02/28/Tinker调研/" title="Pre: Tinker调研">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="Mini Archives"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/2016/08/10/Github-Hexo搭建博客全记录/" title="Next: Github+Hexo搭建博客全记录">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2017/02/28/Tinker调研/">Tinker调研</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/20/openresty-rsa加解密库/">openresty-rsa加解密库</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/10/Github-Hexo搭建博客全记录/">Github+Hexo搭建博客全记录</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016-2017 littlebyte
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="A fast, simple &amp; powerful blog framework">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="Another simple and elegant theme for Hexo  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="Site Visitors"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="Page Hits"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+    <script src="/js/GithubRepoWidget.js"></script>
+
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var iPad = window.navigator.userAgent.indexOf('iPad');
+            if (iPad > -1 || $(".left-col").css("display") === "none") {
+                var bgColorList = ["#9db3f4", "#414141", "#e5a859", "#f5dfc6", "#c084a0", "#847e72", "#cd8390", "#996731"];
+                var bgColor = Math.ceil(Math.random() * (bgColorList.length - 1));
+                $("body").css({"background-color": bgColorList[bgColor], "background-size": "cover"});
+            }
+            else {
+                var backgroundnum = 5;
+                var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+                $("body").css({"background": backgroundimg, "background-attachment": "fixed", "background-size": "cover"});
+            }
+        })
+    </script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="Back to Top"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="Comments"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="Go to Bottom"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+             github: ".github-widget a", 
+            
+             post: ".article-entry a[href], .copyright a[href]", 
+            
+            
+            
+            
+            
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+    <script>
+        var originTitle = document.title;
+        var titleTime;
+        document.addEventListener("visibilitychange", function() {
+            if (document.hidden) {
+                document.title = "(つェ⊂) 我藏好了哦~ " + originTitle;
+                clearTimeout(titleTime);
+            }
+            else {
+                document.title = "(*´∇｀*) 被你发现啦~ " + originTitle;
+                titleTime = setTimeout(function() {
+                    document.title = originTitle;
+                }, 2000);
+            }
+        })
+    </script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>

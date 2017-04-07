@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="littlebyte" />
+
+
+
+<meta name="description" content="断断续续花了差不多3天时间，终于搭好了这个博客，心情大好，决定记录下本人搭建过程的一点心得，以供同样在摸索的你参考">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Github+Hexo搭建博客全记录">
+<meta property="og:url" content="http://little-byte.com/2016/08/10/Github-Hexo搭建博客全记录/index.html">
+<meta property="og:site_name" content="little-byte写字台">
+<meta property="og:description" content="断断续续花了差不多3天时间，终于搭好了这个博客，心情大好，决定记录下本人搭建过程的一点心得，以供同样在摸索的你参考">
+<meta property="og:image" content="http://om2bpqram.bkt.clouddn.com/1488416894394.jpg">
+<meta property="og:image" content="http://om2bpqram.bkt.clouddn.com/1488435176017.jpg">
+<meta property="og:updated_time" content="2017-03-03T11:06:16.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Github+Hexo搭建博客全记录">
+<meta name="twitter:description" content="断断续续花了差不多3天时间，终于搭好了这个博客，心情大好，决定记录下本人搭建过程的一点心得，以供同样在摸索的你参考">
+<meta name="twitter:image" content="http://om2bpqram.bkt.clouddn.com/1488416894394.jpg">
+
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="little-byte写字台" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/favicon.png">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>Github+Hexo搭建博客全记录 | little-byte写字台</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: true
+    }
+</script>
+
+
+    <script>
+        yiliaConfig.jquery_ui = [true, "//cdn.bootcss.com/jqueryui/1.10.4/jquery-ui.min.js", "//cdn.bootcss.com/jqueryui/1.10.4/css/jquery-ui.min.css"];
+    </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.png" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">littlebyte</a></h1>
+        </hgroup>
+
+        
+
+        
+            <form id="search-form">
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="false" />
+            <i class="fa fa-times" onclick="resetSearch()"></i>
+            </form>
+            <div id="local-search-result"></div>
+            <p class='no-result'>No results found <i class='fa fa-spinner fa-pulse'></i></p>
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>Menu</li>
+                        <li>Tags</li>
+                        
+                        <li>Friends</li>
+                        
+                        
+                        <li>About Me</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="mailto:lizhj@corp.21cn.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" href="https://github.com/LittleLiByte" title="GitHub"></a>
+                            
+                                <a class="fa 网易云音乐" href="http://music.163.com/#/user/home?id=40353865" title="网易云音乐"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/">Hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Lua/">Lua</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nginx/">Nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RSA/">RSA</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tinker/">Tinker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/YeLee/">YeLee</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/热修复/">热修复</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://pages.github.com/">GitHub</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="http://moxfive.xyz/">MOxFIVE</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">专注于前端</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">littlebyte</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">littlebyte</a></h1>
+            </hgroup>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="mailto:lizhj@corp.21cn.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="https://github.com/LittleLiByte" title="GitHub"></a>
+                            
+                                <a class="fa 网易云音乐" target="_blank" href="http://music.163.com/#/user/home?id=40353865" title="网易云音乐"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="Tags" friends="Friends" about="About Me"/>
+</nav>
+      <div class="body-wrap"><article id="post-Github-Hexo搭建博客全记录" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/08/10/Github-Hexo搭建博客全记录/" class="article-date">
+      <time datetime="2016-08-10T08:53:22.000Z" itemprop="datePublished">2016-08-10</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Github+Hexo搭建博客全记录
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/博客搭建/">博客搭建</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hexo/">Hexo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/YeLee/">YeLee</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h2 id="1-Github-配置"><a href="#1-Github-配置" class="headerlink" title="1. Github 配置"></a>1. Github 配置</h2><h3 id="Github-账号注册"><a href="#Github-账号注册" class="headerlink" title="Github 账号注册"></a>Github 账号注册</h3><p>*要在Github 上面搭建博客当然需要有个账号了，没有的赶紧注册一个，现在的程序员没有一个Github还怎么愉快装逼（误）。<br><a href="https://github.com/" target="_blank" rel="external">传送门</a>。怎么注册就不用细说了吧。</p>
+<h3 id="新建仓库"><a href="#新建仓库" class="headerlink" title="新建仓库"></a>新建仓库</h3><p>新建一个仓库，用来放博客相关的配置和文章。名字可以随意，反正以后也能改。博客仓库一般都会起这个名字：<br><strong>github账号名字.github.io</strong>。<br>其他配置也随意，按个人喜好填写，如果实在懒直接下一步。╭(╯^╰)╮</p>
+<h3 id="仓库配置"><a href="#仓库配置" class="headerlink" title="仓库配置"></a>仓库配置</h3><ul>
+<li>进入仓库，仓库标题下方有7个导航，点击最右侧的<strong>Setting</strong>进入仓库属性设置</li>
+<li>然后点击GitHub Pages 项下的<strong>Launch automatic page generator</strong>按钮</li>
+<li>接着如果在新建仓库的时候又生成README.md文件可以选择<strong>Load README.md</strong></li>
+<li>没有README.md文件则直接点击<strong>Continue to layouts</strong>进入主题选择，随便选一个就好，反正接下来会用更好的Hexo主题</li>
+<li>再接着点击<strong>Publish page</strong>搞定</li>
+</ul>
+<p>这时候可以在setting页面找到刚刚创建的静态站点的访问地址<strong>Your site is published at xxx</strong>，如果仓库名字是<strong>github账号名字.github.io</strong>，那么访问 <strong><a href="http://github账号名字.github.io" target="_blank" rel="external">http://github账号名字.github.io</a></strong> 就可以看到自己创建好的站点了。</p>
+<h2 id="2-域名绑定"><a href="#2-域名绑定" class="headerlink" title="2.域名绑定"></a>2.域名绑定</h2><p>实际上无需购买域名也可以搭建博客，因此如果不打算购买域名可以跳过此步。不过我觉得使用自己的个性域名会更加酷…</p>
+<h3 id="域名购买"><a href="#域名购买" class="headerlink" title="域名购买"></a>域名购买</h3><p>我的域名在<a href="https://wanwang.aliyun.com/" target="_blank" rel="external">万网</a>买的，当然你可以选择<a href="https://www.dnspod.cn/" target="_blank" rel="external">dnspod</a>。不过个人感觉在万网购买会便宜点。根据个人喜好和经济情况选择域名和购买年限。</p>
+<ul>
+<li>在<strong>万网</strong>购买域名后，登录到控制台，进入域名选项页面，给你所购买的域名添加解析，因为博客使用的是Github提供的github pages，因此将<strong>github账号名字.github.io</strong>这个网站的IP地址设置为解析IP，可以使用Ping命令查看github账号名字.github.io的IP地址。</li>
+<li>设置完成后，还需要在你新建的博客仓库下设置<strong>Custom domain</strong>，即把你的Github Pages和你购买的域名绑定，这样访问你所购买的域名就会重定向到博客所在的Github Pages。<br>如果还有疑问可以参考阿里云的云解析<a href="https://help.aliyun.com/knowledge_detail/29716.html?spm=5176.product29697.3.1.n5T5E9" target="_blank" rel="external">解析设置入门指南</a>。</li>
+</ul>
+<h2 id="3-使用Hexo博客框架"><a href="#3-使用Hexo博客框架" class="headerlink" title="3.使用Hexo博客框架"></a>3.使用Hexo博客框架</h2><blockquote>
+<p>Hexo 是一个快速、简洁且高效的博客框架。Hexo 使用 Markdown（或其他渲染引擎）解析文章，在几秒内，即可利用靓丽的主题生成静态网页。</p>
+</blockquote>
+<ul>
+<li>Hexo相比于原生的Github Pages，无论是写作和部署的便捷性上还是主题美观程度上都好太多，所以使用Hexo博客框架是现在的潮流。<br>要使用Hexo，首先需要安装好<a href="https://git-scm.com/download/win" target="_blank" rel="external">Git</a>和<a href="http://nodejs.cn/" target="_blank" rel="external">NodeJs</a>,都是exe安装包，如果没有什么特殊需求一路默认设置下一步就可以了。</li>
+<li>打开命令行窗口，输入<strong>npm install -g hexo-cli</strong>，耐心等待下载完成，即可安装好Hexo。</li>
+<li>在你喜欢的目录下，按住Shift+鼠标右键，选择<strong>在此处打开命令行窗口</strong>，然后输入命令<strong>hexo init xxx</strong>,其中xxx名字可以随便起。耐心等待hexo初始化和依赖组件下载完成，等到命令行窗口输出<strong>INFO  Start blogging with Hexo!</strong>，初始化才是真正完成。</li>
+</ul>
+<p><img src="http://om2bpqram.bkt.clouddn.com/1488416894394.jpg" alt="enter description here"></p>
+<ul>
+<li>一般来说，只需关注<strong>网站配置文件_config.yml</strong>，<strong>博客文章存放目录source/_posts</strong>，<strong>网站主题目录theme</strong>。</li>
+</ul>
+<h3 id="网站配置文件-config-yml"><a href="#网站配置文件-config-yml" class="headerlink" title="网站配置文件_config.yml"></a>网站配置文件_config.yml</h3><p>具体config.yml配置请参考<a href="https://hexo.io/zh-cn/docs/configuration.html" target="_blank" rel="external">Hexo官方说明文档</a>.这里我只说我修改的地方。</p>
+<ul>
+<li><strong>title</strong> 博客和网页标签显示的标题，按个人喜好随意</li>
+<li><strong>subtitle</strong> 博客副标题标题，一般写简介或者自己喜欢的话</li>
+<li><strong>author</strong> 作者名字，随便起</li>
+<li><strong>language</strong> 作者名字，随便起</li>
+<li><strong>language</strong>除非你英文特牛逼，否则一般都会改成zh-CN</li>
+<li><strong>url</strong> 设置为你购买的域名，如果没有购买域名可以设置为gtihub博客仓库地址</li>
+<li><strong>deploy</strong>  需要进行如下设置：<br>　　type: git<br>　　repo:博客仓库的git地址，比如我的是<a href="https://github.com/LittleLiByte/littlelibyte.github.io.git。" target="_blank" rel="external">https://github.com/LittleLiByte/littlelibyte.github.io.git。</a><br>其他配置属性留到主题设置时再细说。</li>
+</ul>
+<h3 id="添加博文"><a href="#添加博文" class="headerlink" title="添加博文"></a>添加博文</h3><ul>
+<li><p>使用命令 <strong>hexo new xxx</strong>   可以新建一篇博文,其中xxx是博文标题。新建完成后，可以在/source/_post目录下找到新建的文章，<strong>.md</strong>格式的文件，后缀名不言而喻，博文使用markdown语法来写。<br>看到这里不知道markdown的小白也许一惊–写个博客还要去学一种新语法?然而markdown语法真的很简单很简单，掌握基础够用的语法只要五分钟。不信？请看<a href="http://www.jianshu.com/p/1e402922ee32/" target="_blank" rel="external">Markdown 语法的简要规则</a>。了解这几个规则就足够写出条理清晰、排版美观的博文了。<br>写完博文后，就可以在博客目录下打开命令行窗口，通过<strong>hexo server</strong>启动hexo本地服务，进行文章预览调试，在浏览器输入<strong><a href="http://localhost:4000" target="_blank" rel="external">http://localhost:4000</a></strong>就可以预览效果了。</p>
+</li>
+<li><p>在将博文部署之前，如果你的博客购买了域名，那么还需要在博客目录的source文件夹下新建一个<strong>CNAME</strong>文件，只需要添加域名上去即可，例如我的域名是little-byte.com，则<strong>CNAME</strong>文件的内容只要添加little-byte.com即可。</p>
+</li>
+</ul>
+<h3 id="将博文部署到Github"><a href="#将博文部署到Github" class="headerlink" title="将博文部署到Ｇithub"></a>将博文部署到Ｇithub</h3><p>在博客目录下打开命令行窗口，输入命令<strong>hexo deploy</strong>即可部署.<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">hexo deploy</div></pre></td></tr></table></figure></p>
+<p>这时候打开你所绑定的域名或者GitHubPages页面，就可以看到你新写的文章了。</p>
+<h2 id="4-更换主题"><a href="#4-更换主题" class="headerlink" title="4.更换主题"></a>4.更换主题</h2><p>Hexo默认的主题是landscape，个人感觉除了背景图比较酷炫之外，其他地方都很一般。所以爱折腾的我就要折腾出自己喜欢的主题。诸多比较之后，选择了YeLee.</p>
+<h3 id="NexT主题下载"><a href="#NexT主题下载" class="headerlink" title="NexT主题下载"></a>NexT主题下载</h3><p>进入到博客目录内，然后通过git将NexT主题文件下载到该文件夹内</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git clone http<span class="variable">s:</span>//github.<span class="keyword">com</span>/MOxFIVE/hexo-theme-yelee.git themes/yelee</div></pre></td></tr></table></figure>
+<h3 id="使用NexT主题"><a href="#使用NexT主题" class="headerlink" title="使用NexT主题"></a>使用NexT主题</h3><p>修改网站配置文件_config.yml，将<strong>theme: landscape</strong>改成<strong>theme: Yelee</strong>，只需这么一句话就可以启用Yelee主题了。<br>可以通过 <code>hexo clean &amp;&amp; hexo s</code> 命令来在本地启用调试，查看效果。<br>一般来说，效果类似下图：</p>
+<p><img src="http://om2bpqram.bkt.clouddn.com/1488435176017.jpg" alt="enter description here"></p>
+<p>然后就可以开始按照自己的喜好进行配置了。YeLee 详细配置文档见此：<a href="http://moxfive.coding.me/yelee/2.Basic-Usage/" target="_blank" rel="external">传送门</a><br><strong>YeLee</strong>说明文档已经说明得非常详细清晰了，这里就不再赘述了。<br>如果搭建过程有疑问，欢迎留言讨论。</p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>Title:</span><a href="/2016/08/10/Github-Hexo搭建博客全记录/">Github+Hexo搭建博客全记录</a></p>
+        <p><span>Author:</span><a href="/" title="Back to Homepage">littlebyte</a></p>
+        <p><span>Created:</span>2016-08-10, 16:53:22</p>
+        <p><span>Updated:</span>2017-03-03, 19:06:16</p>
+        <p>
+            <span>Full URL:</span><a class="post-url" href="/2016/08/10/Github-Hexo搭建博客全记录/" title="Github+Hexo搭建博客全记录">http://little-byte.com/2016/08/10/Github-Hexo搭建博客全记录/</a>
+            <span class="copy-path" data-clipboard-text="From http://little-byte.com/2016/08/10/Github-Hexo搭建博客全记录/　　By littlebyte" title="Copy Article&#39;s Link &amp; Author"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>License:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"CC BY-NC-SA 4.0"</a> Keep Link &amp; Author if Distribute.
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/2016/08/20/openresty-rsa加解密库/">
+                    openresty-rsa加解密库
+                </a>
+            </div>
+        
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Github-配置"><span class="toc-number">1.</span> <span class="toc-text">1. Github 配置</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Github-账号注册"><span class="toc-number">1.1.</span> <span class="toc-text">Github 账号注册</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#新建仓库"><span class="toc-number">1.2.</span> <span class="toc-text">新建仓库</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#仓库配置"><span class="toc-number">1.3.</span> <span class="toc-text">仓库配置</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-域名绑定"><span class="toc-number">2.</span> <span class="toc-text">2.域名绑定</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#域名购买"><span class="toc-number">2.1.</span> <span class="toc-text">域名购买</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-使用Hexo博客框架"><span class="toc-number">3.</span> <span class="toc-text">3.使用Hexo博客框架</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#网站配置文件-config-yml"><span class="toc-number">3.1.</span> <span class="toc-text">网站配置文件_config.yml</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#添加博文"><span class="toc-number">3.2.</span> <span class="toc-text">添加博文</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#将博文部署到Github"><span class="toc-number">3.3.</span> <span class="toc-text">将博文部署到Ｇithub</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-更换主题"><span class="toc-number">4.</span> <span class="toc-text">4.更换主题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#NexT主题下载"><span class="toc-number">4.1.</span> <span class="toc-text">NexT主题下载</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用NexT主题"><span class="toc-number">4.2.</span> <span class="toc-text">使用NexT主题</span></a></li></ol></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="Hide"  title="Show or Hide Table of Contents">
+
+    <script>
+        yiliaConfig.toc = ["Hide", "Show", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"Github+Hexo搭建博客全记录　| little-byte写字台　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+      <div class="duoshuo" id="comments">
+    <div id="comment-box" ></div>
+    <div class="ds-thread" id="ds-thread" data-thread-key="2016/08/10/Github-Hexo搭建博客全记录/" data-title="Github+Hexo搭建博客全记录" data-url="http://little-byte.com/2016/08/10/Github-Hexo搭建博客全记录/"></div>
+    <script>
+        var duoshuoQuery = {short_name:"little-byte.duoshuo.com"};
+        var loadComment = function(){
+            var d = document, s = d.createElement('script');
+            s.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+            s.async = true; s.charset = 'UTF-8';
+            (d.head || d.body).appendChild(s);
+        }
+
+        
+    </script>
+    
+    <script> loadComment(); </script>
+
+</div>
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2016/08/20/openresty-rsa加解密库/" title="Pre: openresty-rsa加解密库">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="Mini Archives"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/" title="Back to Homepage"><i class="fa fa-home"></i></a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2017/02/28/Tinker调研/">Tinker调研</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/20/openresty-rsa加解密库/">openresty-rsa加解密库</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/10/Github-Hexo搭建博客全记录/">Github+Hexo搭建博客全记录</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016-2017 littlebyte
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="A fast, simple &amp; powerful blog framework">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="Another simple and elegant theme for Hexo  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="Site Visitors"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="Page Hits"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+    <script src="/js/GithubRepoWidget.js"></script>
+
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var iPad = window.navigator.userAgent.indexOf('iPad');
+            if (iPad > -1 || $(".left-col").css("display") === "none") {
+                var bgColorList = ["#9db3f4", "#414141", "#e5a859", "#f5dfc6", "#c084a0", "#847e72", "#cd8390", "#996731"];
+                var bgColor = Math.ceil(Math.random() * (bgColorList.length - 1));
+                $("body").css({"background-color": bgColorList[bgColor], "background-size": "cover"});
+            }
+            else {
+                var backgroundnum = 5;
+                var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+                $("body").css({"background": backgroundimg, "background-attachment": "fixed", "background-size": "cover"});
+            }
+        })
+    </script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="Back to Top"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="Comments"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="Go to Bottom"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+             github: ".github-widget a", 
+            
+             post: ".article-entry a[href], .copyright a[href]", 
+            
+            
+            
+            
+            
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+    <script>
+        var originTitle = document.title;
+        var titleTime;
+        document.addEventListener("visibilitychange", function() {
+            if (document.hidden) {
+                document.title = "(つェ⊂) 我藏好了哦~ " + originTitle;
+                clearTimeout(titleTime);
+            }
+            else {
+                document.title = "(*´∇｀*) 被你发现啦~ " + originTitle;
+                titleTime = setTimeout(function() {
+                    document.title = originTitle;
+                }, 2000);
+            }
+        })
+    </script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>
