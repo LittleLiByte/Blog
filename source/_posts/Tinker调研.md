@@ -19,7 +19,7 @@ description:
  2. **美团的Robust**兼容性与成功率最高，但是它与AndFix一样，无法新增变量与类只能用做的bugFix方案，并且尚未开源，不过有参照Robust的install run原理实现的[开源方案][2]，不过较少人关注，实际效果未知。
  3. **百度金融的RocooFix**是Nuwa方案的改良版，增加了lib替换和即时生效支持，但是不支持在windows平台生成补丁，兼容性还有待测试。
  4. **饿了么的Amigo**是非常强大的一个方案，不仅是类替换，lib替换，资源替换都支持，同时也支持新增四大组件，缺点是不支持Android 3.0 ，notification & widget中RemoteViews的自定义布局不支持修改,只支持内容修复。
-
+<!-- more -->
 Amigo官方wiki介绍
 
 > Amigo 原理与 QQZone

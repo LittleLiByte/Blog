@@ -13,7 +13,7 @@ description: "最近在项目中用到OpenResty做服务端的接口，其中接
 http://hayageek.com/rsa-encryption-decryption-openssl-c/
 
 下面就来说说整个开发详细流程
-
+<!-- more -->
 ## 安装OpenSSL
 RSA加密和解密的公钥私钥由OpenSSL生成。在Ubuntu下，安装OpenSSL通过以下两条命令可以完成：
 ``` bash
